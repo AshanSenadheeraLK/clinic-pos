@@ -1,0 +1,46 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+
+# Electron
+/dist/
+/out/
+
+# VS Code
+.vscode/
+
+# Build output
+dist/
+build/
+
+# Misc
+.env
+.env.*
+
+# SASS
+.sass-cache/
+
+# Coverage
+coverage/
+
+# Others
+*.tgz
+*.swp
+*.swo
+
+# Ignore by pattern
+*.bak
+*.tmp
