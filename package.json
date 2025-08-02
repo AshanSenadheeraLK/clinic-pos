@@ -6,7 +6,10 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-packager . medical-clinic-pos --platform=win32 --arch=x64 --out=dist --overwrite",
+    "build-linux": "electron-packager . medical-clinic-pos --platform=linux --arch=x64 --out=dist --overwrite",
+    "build-mac": "electron-packager . medical-clinic-pos --platform=darwin --arch=x64 --out=dist --overwrite"
   },
   "keywords": ["electron", "medical", "pos", "clinic"],
   "author": "KDJ Team",
