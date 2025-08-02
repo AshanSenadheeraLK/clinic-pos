@@ -12,8 +12,8 @@
     "build-mac": "electron-packager . medical-clinic-pos --platform=darwin --arch=x64 --out=dist --overwrite"
   },
   "keywords": ["electron", "medical", "pos", "clinic"],
-  "author": "KDJ Team",
-  "license": "ISC",
+  "author": "H.M. Ashan Janith Dilshan Senadheera",
+  "license": "CC BY-NC 4.0",
   "type": "commonjs",
   "devDependencies": {
     "electron": "^37.2.5"
