@@ -5,6 +5,23 @@ const Database = require('./src/database/database');
 let mainWindow;
 let database;
 
+async function showTodayAppointmentsReminder() {
+  const appointments = await database.getTodayAppointments();
+  if (appointments.length > 0) {
+    const list = appointments
+      .map(a => `${a.patientName} (Dr. ${a.doctorName}) @ ${a.time}`)
+      .join(', ');
+    const message = `Reminder: You have ${appointments.length} appointment${
+      appointments.length > 1 ? 's' : ''
+    } today: ${list}`;
+    dialog.showMessageBox(mainWindow, {
+      type: 'info',
+      title: "Today's Appointments",
+      message
+    });
+  }
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -36,6 +53,7 @@ app.whenReady().then(async () => {
   await database.initialize();
 
   createWindow();
+  mainWindow.once('ready-to-show', showTodayAppointmentsReminder);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
