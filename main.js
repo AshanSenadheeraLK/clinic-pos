@@ -1,9 +1,40 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Notification } = require('electron');
 const path = require('path');
 const Database = require('./src/database/database');
 
 let mainWindow;
 let database;
+
+/**
+ * Show a system notification summarizing today's appointments.
+ * Executed during application startup after the database has initialized.
+ */
+async function showDailyReminder() {
+  try {
+    const appointments = await database.getTodayAppointments();
+    if (appointments.length === 0) return;
+
+    const summary = appointments
+      .map((apt) => {
+        const time = new Date(`1970-01-01T${apt.time}`).toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: '2-digit',
+        });
+        return `${apt.patientName} (Dr. ${apt.doctorName}) @ ${time}`;
+      })
+      .join(', ');
+
+    const notification = new Notification({
+      title: 'Daily Appointment Reminder',
+      body: `You have ${appointments.length} appointment${
+        appointments.length > 1 ? 's' : ''
+      } today: ${summary}.`,
+    });
+    notification.show();
+  } catch (error) {
+    console.error('Failed to show daily reminder:', error);
+  }
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -36,6 +67,8 @@ app.whenReady().then(async () => {
   await database.initialize();
 
   createWindow();
+
+  await showDailyReminder();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

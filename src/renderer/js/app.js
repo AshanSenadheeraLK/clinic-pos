@@ -92,7 +92,7 @@ class MedicalClinicPOS {
             appointments.forEach(appointment => {
                 content += `
                     <div class="appointment-item">
-                        <div class="appointment-time">${appointment.time}</div>
+                        <div class="appointment-time">${this.formatTime(appointment.time)}</div>
                         <div class="patient-name">${appointment.patientName}</div>
                         <div class="doctor-name">Dr. ${appointment.doctorName}</div>
                         <div class="text-muted">${appointment.reasonForVisit}</div>
@@ -424,11 +424,16 @@ class MedicalClinicPOS {
 
     formatDate(dateString) {
         const date = new Date(dateString + 'T00:00:00');
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
         });
+    }
+
+    formatTime(timeString) {
+        const date = new Date(`1970-01-01T${timeString}`);
+        return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     }
 
     showAlert(message, type) {
