@@ -5,15 +5,50 @@ class MedicalClinicPOS {
         this.currentAppointment = null;
         this.appointments = [];
         this.bills = [];
+        this.currency = this.getSavedCurrency() || { code: 'LKR', symbol: 'Rs' };
         this.init();
+    }
+
+    getSavedCurrency() {
+        try {
+            const code = localStorage.getItem('currencyCode') || 'LKR';
+            const symbol = localStorage.getItem('currencySymbol') || 'Rs';
+            return { code, symbol };
+        } catch {
+            return { code: 'LKR', symbol: 'Rs' };
+        }
+    }
+
+    saveCurrency(code, symbol) {
+        try {
+            localStorage.setItem('currencyCode', code);
+            localStorage.setItem('currencySymbol', symbol);
+        } catch {}
     }
 
     async init() {
         this.setupEventListeners();
         this.displayCurrentDate();
+        this.initCurrencySelector();
         await this.loadData();
         await this.checkTodayAppointments();
         this.showSection('appointments');
+    }
+
+    initCurrencySelector() {
+        const currencySelect = document.getElementById('currencySelect');
+        if (!currencySelect) return;
+        // Set initial value
+        currencySelect.value = this.currency.code;
+        // Listen for changes
+        currencySelect.addEventListener('change', (e) => {
+            const selected = currencySelect.options[currencySelect.selectedIndex];
+            const code = selected.value;
+            const symbol = selected.getAttribute('data-symbol') || code;
+            this.currency = { code, symbol };
+            this.saveCurrency(code, symbol);
+            this.calculateTotal();
+        });
     }
 
     setupEventListeners() {
@@ -281,13 +316,12 @@ class MedicalClinicPOS {
     calculateTotal() {
         const amounts = document.querySelectorAll('.item-amount');
         let total = 0;
-        
         amounts.forEach(input => {
             const value = parseFloat(input.value) || 0;
             total += value;
         });
-        
-        document.getElementById('totalAmount').value = `₹${total.toFixed(2)}`;
+        const symbol = this.currency?.symbol || 'Rs';
+        document.getElementById('totalAmount').value = `${symbol}${total.toFixed(2)}`;
         this.updateBillPreview();
     }
 
@@ -313,7 +347,7 @@ class MedicalClinicPOS {
                 total += amount;
             }
         }
-
+        const symbol = this.currency?.symbol || 'Rs';
         let billContent = `
             <div class="mb-3">
                 <strong>Patient:</strong> ${selectedAppointment.patientName}<br>
@@ -325,7 +359,6 @@ class MedicalClinicPOS {
             <div class="mb-3">
                 <h6>Services & Items:</h6>
         `;
-
         if (items.length === 0) {
             billContent += '<p class="text-muted">No items added yet...</p>';
         } else {
@@ -333,21 +366,19 @@ class MedicalClinicPOS {
                 billContent += `
                     <div class="d-flex justify-content-between">
                         <span>${item.name}</span>
-                        <span>₹${item.amount.toFixed(2)}</span>
+                        <span>${symbol}${item.amount.toFixed(2)}</span>
                     </div>
                 `;
             });
         }
-
         billContent += `
             </div>
             <hr>
             <div class="d-flex justify-content-between">
                 <strong>Total Amount:</strong>
-                <strong>₹${total.toFixed(2)}</strong>
+                <strong>${symbol}${total.toFixed(2)}</strong>
             </div>
         `;
-
         document.getElementById('billContent').innerHTML = billContent;
     }
 
